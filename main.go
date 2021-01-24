@@ -30,11 +30,12 @@ func main() {
 	app := fiber.New(fiber.Config{
 		StrictRouting: true,
 	})
+
 	app.Use(logger.New())
 
 	setupRoutes(app)
 
-	err := app.Listen(":8000")
+	err := app.Listen(":8080")
 
 	if err != nil {
 		panic(err)
