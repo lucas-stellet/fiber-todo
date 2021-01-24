@@ -1,6 +1,10 @@
 package controllers
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"fmt"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 // Todo ...
 type Todo struct {
@@ -9,7 +13,7 @@ type Todo struct {
 	Completed bool   `json:"completed"`
 }
 
-var todos = []Todo{
+var todos = []*Todo{
 	{
 		ID:        1,
 		Title:     "Walk the dog",
@@ -28,6 +32,40 @@ func GetTodos(c *fiber.Ctx) error {
 		"success": true,
 		"data": fiber.Map{
 			"todos": todos,
+		},
+	})
+}
+
+// CreateTodo ...
+func CreateTodo(c *fiber.Ctx) error {
+	type Request struct {
+		Title string `json:"title"`
+	}
+
+	var body Request
+
+	err := c.BodyParser(&body)
+
+	if err != nil {
+		fmt.Println(err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"success": false,
+			"message": "Cannot parse JSON",
+		})
+	}
+
+	todo := &Todo{
+		ID:        len(todos) + 1,
+		Title:     body.Title,
+		Completed: false,
+	}
+
+	todos = append(todos, todo)
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"success": true,
+		"data": fiber.Map{
+			"todo": todo,
 		},
 	})
 }
